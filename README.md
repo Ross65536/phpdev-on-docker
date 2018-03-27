@@ -1,7 +1,7 @@
 
 ## Intro
 
-This README describes how to setup the development environment for LBAW. 
+This README describes how to setup the development environment for LBAW. It was prepared to run on Linux but it should be fairly easy to follow and adapt for the remaining operating systems.
 
 * [Installing Docker and Docker Compose](#installing-docker-and-docker-compose)
 * [Docker Containers](#docker-containers)
@@ -14,12 +14,12 @@ This README describes how to setup the development environment for LBAW.
 
 If you're not familiar with Docker you can have a quick grasp of the tool by looking into its documentation [What is docker?](https://www.docker.com/what-docker) or watching [Docker in 12 Minutes](https://www.youtube.com/watch?v=YFl2mCHdv24) and [Docker Compose in 12 Minutes](https://www.youtube.com/watch?v=Qw9zlE3t8Ko).
 
-But essentially what you'll need to know is that Docker is a tool that allows you to run  __containers__ (similar to virtual machines, but much lighter). This is good because: 
-1. We get consistent environments anywhere we want. In our case development (your PC(s)) and production (xxxx.lbaw-prod.fe.up.pt).
+But essentially, what you'll need to know is that Docker is a tool that allows you to run  __containers__ (similar to virtual machines, but much lighter). And this is good because: 
+1. We get consistent environments anywhere we want. In our case development (your PCs) and production (xxxx.lbaw-prod.fe.up.pt).
 2. Because we can share this containers __images__, it is simpler to replicate an environment setup (as we will do here).
 3. And because containers are fairly light, we can split our applications into many as we want, helping us having better modularity and a consequently less dependencies related headaches (aka micro services).
 
-Docker Compose is a tool that helps us managing multiple containers at once.
+__Docker Compose__ is a tool that helps us manage multiple containers at once. Specify, start, pause, stop, and so on.
 
 
 ### Configured Containers
@@ -138,9 +138,9 @@ After the steps above you will have updated your repository with the required la
 
 You will be using _PostgreSQL_ to implement this project. We've created a _docker-compose_ file that
 sets up _PostgreSQL_ and _pgadmin 4_ locally. From the project root issue the following command:
-
+```
     docker-compose up
-
+```
 This will start the database and _pgadmin_. The database's username is `postgres` and the password
 `pg!fcp`. You can access http://localhost:5050 to access _pgadmin 4_ and manage your database. On the
 first usage you will need to add the connection to the database using the following attributes:
