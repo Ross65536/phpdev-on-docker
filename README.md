@@ -119,7 +119,7 @@ This will automagically do everything for you. But it is important that you know
 
 __Everything should now be up and running.__ Checkout your web server at `http://localhost:8000`, the phpadmin at `http://localhost:5050` and mailhog at `http://localhost:8025`. To stop the servers just hit __Ctrt^C__.
 
-__To restart the containers__, you just issue `docker-compose up` again. This docker-compose up followed by Ctrl^C is similar to turn on and off your computer, meaning that everything will be kept including the data at your database. But if for some reason you want to start fresh you can run `docker-compose down` which will destroy your the containers. The next time you run `docker-compose up`, docker instantiates brand new containers from the previously compiled __images__. (But you'll probably just want to re seed the database [publish your image](#publishing-your-image)) Either way, your code will always be kept because it leaves in your computer and only is shared with the container.
+__To restart the containers__, you just issue `docker-compose up` again. This docker-compose up followed by Ctrl^C is similar to turn on and off your computer, meaning that everything will be kept including the data at your database. But if for some reason you want to start fresh you can run `docker-compose down` which will destroy your the containers. The next time you run `docker-compose up`, docker instantiates brand new containers from the previously compiled __images__. (But you'll probably just want to re seed the database [publish your image](#publishing-your-image)) Either way, your code will always be kept because it lives in the host (your computer) and only is shared with the container.
 
 
 __When you [publish your image](#publishing-your-image),__ the project source code will be copied to a brand new PHP container, slightly differently configured, and uploaded to Docker Hub. Latter on it will be pulled by an automated process to the production server and, due to the different setup configurations, it will connect to your database at the dbm.fe.up.pt, using the credentials previously given to you.
@@ -146,16 +146,19 @@ you might notice that the terminal prompt changes to something like `root@acf3db
 ```
 to leave the container execute `exit`.
 
-__Note that the container must be running__ in order that you can run exec. Therefore if you pause the containers by hitting Ctrl^C, for example, it won't work. This means that you'll have to have one terminal for running the containers and another to exec commands onto the php container. Another approach is to run docker in detached/background mode
+__Note that the container must be running__ in order that you can run exec. Therefore if you pause the containers by hitting Ctrl^C, for example, it won't work. This means that you'll have to have one terminal for running the containers and another to exec commands onto the php container. I prefer the first approach but another possible one is to run docker in detached/background mode
 ```
     docker-compose -d up
     # do other things such exec into a container
     
     docker-compose stop # pauses the containers
 ```
-> I prefer the first approach.
 
-__(Bonus) This happens because__ in Docker each container is running a main never-ending process, being that the life cicle of a container is tied to that process. In other words, a container only exists to run that main process. In fact when you hit `docker-composer up` and launch the containers, each has one process associated e.g., the php container has the php server, postgres the postgres server, and so on.
+> __ This happens because__ in Docker each container is running a main never-ending process, being that the life cicle of a container is tied to that process. In other words, a container only exists to run that main process. In fact when you hit `docker-composer up` and launch the containers, each has one process associated e.g., the php container has the php server, postgres the postgres server, and so on.
+
+__You might run into file permissions issues__ if you use `php artisan make` to generate files. This happens because these files will be created by the php container root user. To solve that you can simply run `sudo chown -R $USER ` after each file(s) generation.
+
+__When you save your changes to git__ simply stage, commit, merge and push your changes as usually. The only caveat is, if you doing that with terminal, and you are using `docker ... bash` to enter the containers, do not forget that you need to be at the host (your pc) when commiting and pushing as thats where your git creadentials and on the other hand if your're not at the host, you might run you'll run into permission issues with the .git files, analogously to the previous paragraph.
 
 # Working with pgAdmin
  
