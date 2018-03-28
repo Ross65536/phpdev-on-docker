@@ -137,7 +137,7 @@ During the development you might need to re seed your database, or reinstall php
 ```
 Another approach is to "enter" the container by executing
 ```
-    docker exec lbaw_php -it bash
+    docker exec -it lbaw_php bash
 ```
 you might notice that the terminal prompt changes to something like `root@acf3dbd56f07:/app# `. So, you can execute
 ```
