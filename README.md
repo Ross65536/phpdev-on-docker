@@ -156,7 +156,7 @@ __Note that the container must be running__ in order that you can run exec. Ther
 
 > This happens because in Docker each container is running a main never-ending process, being that the life cicle of a container is tied to that process. In other words, a container only exists to provide an environment in which that process can be run. In fact when you hit `docker-composer up` and launch the containers, each has one process associated e.g., the php container has the php server, postgres the postgres server, and so on.
 
-__You might run into file permissions issues__ if you use `php artisan make` to generate files. This happens because these files will be created by the php container root user. To solve that you can simply run `sudo chown -R $USER ` at the host, after each file(s) generation.
+__You might run into file permissions issues__ if you use `php artisan make` to generate files. This happens because these files will be created by the php container root user. To solve that you can simply run `sudo chown -R $USER .` at the host, after each file(s) generation.
 
 __When you save your changes to git__ simply stage, commit, merge and push your changes as usually. The only caveat is, if you doing that with terminal, and you are using `docker ... bash` to enter the containers, do not forget that you need to be at the host when commiting and pushing, as thats where your git creadentials live and, on the other hand, if your're not at the host, you you'll run into permission issues with the .git files, analogously to the previous paragraph.
 
