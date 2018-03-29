@@ -32,7 +32,6 @@ You can check the official instructions here,
     docker-compose --version # verify that you have Docker Compose installed.
     
     
-    
 # Setting up the Development repository    
 
 You should have your own repository and a copy of the demo repository in the same folder in your machine.  Then, copy the contents of the demo repository to your own:
@@ -43,8 +42,16 @@ You should have your own repository and a copy of the demo repository in the sam
     # clone this branch of the demo repository
     git clone -b phpdev-on-docker git@github.com:lbaw-admin/lbaw-laravel.git
     
+    --JCL
+    Cloning into 'lbaw-laravel'...
+    fatal: Remote branch phpdev-on-docker not found in upstream origin
+    git clone -b phpdev-on-docker git@github.com:lbaw-admin/phpdev-on-docker.git
+    
     # remove the git folder from the demo
     rm -rf lbaw-laravel/.git
+    
+    --JCL
+    rm -rf phpdev-on-docker/.git
     
     # goto your repository
     cd lbaw17GG
@@ -55,6 +62,10 @@ You should have your own repository and a copy of the demo repository in the sam
     # copy all the demo files
     cp -r ../lbaw-laravel/ .
     
+    -- JCL
+    rsync -av ../phpdev-on-docker/ .
+    rm -rf phpdev-on-docker
+    
     # add the new files to your repository
     git add .  
     git commit -m "Base laravel structure"
@@ -64,7 +75,6 @@ You should have your own repository and a copy of the demo repository in the sam
 
 Notice that you need to substitute \<YOUR GITHUB\> with the username of the team member that owns the
 repository. At this point you should have the project skeleton in your local machine and be ready to start.
-  
  
 # Starting Docker Containers
 > For sake of time saving, you might just go ahead and execute `docker-compose up` at you're project root. While it runs, come back and read this section. Also make sure you're using a reasonable internet connection.
@@ -93,7 +103,7 @@ __Docker Compose__ is a tool that helps us manage multiple containers at once. S
 +-------------------------------------+
 ```
 
-For development purposes we have 4 configured containers. Which are specified under services at docker-compose.yml 
+For development purposes we have 4 configured containers. Which are specified under services at `docker-compose.yml` 
 1. __php__ It is were your app source-code lives.
 2. __postgres__ It hosts your (local) database.
 3. __pgadmin__ It is a tool that that helps you interacting with your Database.
@@ -115,17 +125,13 @@ This will automagically do everything for you. But it is important that you know
 5. When the php container is launched, the __docker_run-dev.sh__ script is run within the container (check the Dockerfile-dev for more details). It will wait for the database server to be ready and then, if it is the first start up, it will install the project dependencies (`composer install`) and seed your database (`php artisan db:seed`). And finally, it launches the php server (`php artisan serve`).
 
 
-
-
 __Everything should now be up and running.__ Checkout your web server at `http://localhost:8000`, the phpadmin at `http://localhost:5050` and mailhog at `http://localhost:8025`. To stop the servers just hit __Ctrt^C__.
 
 __To restart the containers__, you just issue `docker-compose up` again. This docker-compose up followed by Ctrl^C is similar to turn on and off your computer, meaning that everything will be kept including the data at your database. But if for some reason you want to start fresh you can run `docker-compose down` which will destroy your the containers. The next time you run `docker-compose up`, docker instantiates brand new containers from the previously compiled __images__. (But you'll probably just want to re seed the database [Development phase](#development-phase) Either way, your code will always be kept because it lives in the host (your computer) and only is shared with the container.
 
-
 __When you [publish your image](#publishing-your-image),__ the project source code will be copied to a brand new PHP container, slightly differently configured, and uploaded to Docker Hub. Latter on it will be pulled by an automated process to the production server and, due to the different setup configurations, it will connect to your database at the dbm.fe.up.pt, using the credentials previously given to you.
 
 > Services and containers are not the same thing. If you have a website with a lot of visits, for instance, you might want to run it on multiple computers but only having one address test.com. So you would be providing a service, but running on multiple containers. But for lbaw, thinking container == service is good enough.
-
 
 
 # Development phase
