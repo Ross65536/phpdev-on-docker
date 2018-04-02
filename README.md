@@ -1,24 +1,24 @@
 
 ## Intro
 
-This README describes how to setup the development environment for LBAW. It was prepared to run on Linux but it should be fairly easy to follow and adapt for the remaining operating systems.
+This README describes how to setup the development environment for LBAW. It was prepared to run on Linux but it should be fairly easy to follow and adapt for other operating systems.
 
 * [Installing Docker and Docker Compose](#installing-docker-and-docker-compose)
 * [Setting up the Development repository](#setting-up-the-development-repository)
-* [Starting Docker Containers](#starting-docker-containers)
+* [Starting Docker containers](#starting-docker-containers)
 * [Development phase](#development-phase)
 * [Working with pgAdmin](#working-with-pgadmin)
-* [Setting up Php Interpreter and Debugger](#setting-up-php-interpreter-and-debugger)
-* [Laravel Code Structure](#laravel-code-structure)
-* [Publishing your image](#publishing-your-image)
+* [Setting up PHP Interpreter and Debugger](#setting-up-php-interpreter-and-debugger)
+* [Laravel code structure](#laravel-code-structure)
+* [Publishing the image](#publishing-your-image)
 
 
 ## Installing Docker and Docker Compose
 Before starting you'll need to have Docker and Docker Compose installed on your PC. 
 
-You can check the official instructions here,
-[Install Docker](https://docs.docker.com/install/) and [Install Docker Compose](https://docs.docker.com/compose/install/#install-compose):
+You can check the official instructions in [Install Docker](https://docs.docker.com/install/) and in [Install Docker Compose](https://docs.docker.com/compose/install/#install-compose):
 
+    # install docker-ce
     sudo apt-get update
     sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -27,6 +27,7 @@ You can check the official instructions here,
     sudo apt-get install docker-ce
     docker run hello-world # make sure that the installation worked
 
+    # install docker-compose
     sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
     docker-compose --version # verify that you have Docker Compose installed.
@@ -39,10 +40,10 @@ You should have your own repository and a copy of the demo repository in the sam
     # clone the group repository, if not yet available locally
     git clone git@github.com:<YOUR GITHUB>/lbaw17GG 
     
-    # clone this branch of the demo repository
+    # clone the branch of the demo copy
     git clone -b phpdev-on-docker git@github.com:lbaw-admin/phpdev-on-docker.git
     
-    # remove the git folder from the demo
+    # remove the Git folder from the demo folder
     rm -rf phpdev-on-docker/.git
     
     # goto your repository
@@ -63,16 +64,14 @@ You should have your own repository and a copy of the demo repository in the sam
 
 Notice that you need to substitute \<YOUR GITHUB\> with the username of the team member that owns the
 repository. At this point you should have the project skeleton in your local machine and be ready to start.
- 
+
+
 # Starting Docker Containers
-> For sake of time saving, you might just go ahead and execute `docker-compose up` at the project root. While it runs, come back and read this section. If you're not familiar with Docker you can have a quick grasp of the tool by looking into its documentation [What is docker?](https://www.docker.com/what-docker).
 
-What you'll need to know is that Docker is a tool that allows you to run  __containers__ (similar to virtual machines, but much lighter). And this is good because: 
-1. We get consistent environments anywhere we want. In our case, development (your PCs) and production (xxxx.lbaw-prod.fe.up.pt).
-2. Because we can share this containers __images__, it is simpler to replicate an environment setup (as we will do here).
-3. And because containers are fairly light, we can split our applications into many as we want, helping us having better modularity and a consequently less dependencies related headaches (aka micro services).
+You might just go ahead and execute `docker-compose up` at the project root and, while it runs, come back and read this section. If you're not familiar with Docker, you can may get a quick grasp of the tool by looking into its documentation [What is docker?](https://www.docker.com/what-docker).
 
-__Docker Compose__ is a tool that helps us manage multiple containers at once. Specify, start, pause, stop, and so on.
+__Docker__ is a tool that allows you to run  __containers__ (similar to virtual machines, but much lighter). 
+__Docker Compose__ is a tool that helps managing multiple containers at once: start, pause, stop, and so on.
 
 
 ### Configured Containers
@@ -85,15 +84,15 @@ __Docker Compose__ is a tool that helps us manage multiple containers at once. S
 |       | |       | |       | |       |
 +-------+ +-------+ +-------+ +-------+
 +-------------------------------------+
-|                                     |
+|             Docker CD               |
 +-------------------------------------+
 ```
 
-For development purposes we have 4 configured containers. Which are specified under services at `docker-compose.yml` 
-1. __php__ It is were your app source-code lives.
-2. __postgres__ It hosts your (local) database.
-3. __pgadmin__ It is a tool that that helps you interacting with the database.
-4. __mailhog__ It offers a "fake" e-mail server and client.
+For development purposes we have 4 configured containers. Which are specified under services at `docker-compose.yml`: 
+1. __php__ --- were your source code lives.
+2. __postgres__ --- to host the development (local) database.
+3. __pgadmin__ --- to help interacting with the database.
+4. __mailhog__ --- offers a "fake" e-mail server and client.
 
 
 __We setup the PHP container__ so that the project folder is shared with the container i.e. it both lives in your PC(s) and in the container. So when you change your code it also changes inside the container. Ports are also opened and forwarded so that, for instance, when you go to http://localhost:8000 on your browser, the requests are redirected to the php container (that is where the php server lives).
