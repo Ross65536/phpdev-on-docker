@@ -40,17 +40,9 @@ You should have your own repository and a copy of the demo repository in the sam
     git clone git@github.com:<YOUR GITHUB>/lbaw17GG 
     
     # clone this branch of the demo repository
-    git clone -b phpdev-on-docker git@github.com:lbaw-admin/lbaw-laravel.git
-    
-    --JCL
-    Cloning into 'lbaw-laravel'...
-    fatal: Remote branch phpdev-on-docker not found in upstream origin
     git clone -b phpdev-on-docker git@github.com:lbaw-admin/phpdev-on-docker.git
     
     # remove the git folder from the demo
-    rm -rf lbaw-laravel/.git
-    
-    --JCL
     rm -rf phpdev-on-docker/.git
     
     # goto your repository
@@ -60,11 +52,7 @@ You should have your own repository and a copy of the demo repository in the sam
     git checkout master 
     
     # copy all the demo files
-    cp -r ../lbaw-laravel/ .
-    
-    -- JCL
     rsync -av ../phpdev-on-docker/ .
-    rm -rf phpdev-on-docker
     
     # add the new files to your repository
     git add .  
@@ -77,11 +65,9 @@ Notice that you need to substitute \<YOUR GITHUB\> with the username of the team
 repository. At this point you should have the project skeleton in your local machine and be ready to start.
  
 # Starting Docker Containers
-> For sake of time saving, you might just go ahead and execute `docker-compose up` at you're project root. While it runs, come back and read this section. Also make sure you're using a reasonable internet connection.
- 
-If you're not familiar with Docker you can have a quick grasp of the tool by looking into its documentation [What is docker?](https://www.docker.com/what-docker) or watching [Docker in 12 Minutes](https://www.youtube.com/watch?v=YFl2mCHdv24) and [Docker Compose in 12 Minutes](https://www.youtube.com/watch?v=Qw9zlE3t8Ko).
+> For sake of time saving, you might just go ahead and execute `docker-compose up` at you're project root. While it runs, come back and read this section. If you're not familiar with Docker you can have a quick grasp of the tool by looking into its documentation [What is docker?](https://www.docker.com/what-docker).
 
-But essentially, what you'll need to know is that Docker is a tool that allows you to run  __containers__ (similar to virtual machines, but much lighter). And this is good because: 
+What you'll need to know is that Docker is a tool that allows you to run  __containers__ (similar to virtual machines, but much lighter). And this is good because: 
 1. We get consistent environments anywhere we want. In our case, development (your PCs) and production (xxxx.lbaw-prod.fe.up.pt).
 2. Because we can share this containers __images__, it is simpler to replicate an environment setup (as we will do here).
 3. And because containers are fairly light, we can split our applications into many as we want, helping us having better modularity and a consequently less dependencies related headaches (aka micro services).
