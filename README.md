@@ -65,7 +65,7 @@ Notice that you need to substitute \<YOUR GITHUB\> with the username of the team
 repository. At this point you should have the project skeleton in your local machine and be ready to start.
  
 # Starting Docker Containers
-> For sake of time saving, you might just go ahead and execute `docker-compose up` at you're project root. While it runs, come back and read this section. If you're not familiar with Docker you can have a quick grasp of the tool by looking into its documentation [What is docker?](https://www.docker.com/what-docker).
+> For sake of time saving, you might just go ahead and execute `docker-compose up` at the project root. While it runs, come back and read this section. If you're not familiar with Docker you can have a quick grasp of the tool by looking into its documentation [What is docker?](https://www.docker.com/what-docker).
 
 What you'll need to know is that Docker is a tool that allows you to run  __containers__ (similar to virtual machines, but much lighter). And this is good because: 
 1. We get consistent environments anywhere we want. In our case, development (your PCs) and production (xxxx.lbaw-prod.fe.up.pt).
