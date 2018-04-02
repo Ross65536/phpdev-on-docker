@@ -92,7 +92,7 @@ __Docker Compose__ is a tool that helps us manage multiple containers at once. S
 For development purposes we have 4 configured containers. Which are specified under services at `docker-compose.yml` 
 1. __php__ It is were your app source-code lives.
 2. __postgres__ It hosts your (local) database.
-3. __pgadmin__ It is a tool that that helps you interacting with your Database.
+3. __pgadmin__ It is a tool that that helps you interacting with the database.
 4. __mailhog__ It offers a "fake" e-mail server and client.
 
 
