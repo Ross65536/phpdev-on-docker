@@ -95,7 +95,7 @@ For development purposes we have 4 configured containers. Which are specified un
 4. __mailhog__ --- offers a "fake" e-mail server and client.
 
 
-We setup the PHP container so that the project folder is shared with the container i.e. it both lives in your PC(s) and in the container. So when you change your code it also changes inside the container. Ports are also opened and forwarded so that, for instance, when you go to http://localhost:8000 on your browser, the requests are redirected to the php container (that is where the PHP server lives).
+We setup the _php container_ so that the project folder is shared with the container i.e. it both lives in your PC(s) and in the container. So when you change your code it also changes inside the container. Ports are also opened and forwarded so that, for instance, when you go to http://localhost:8000 on your browser, the requests are redirected to the _php container_ (that is where the PHP server lives).
 
 __To start the servers__ you simply need to run 
 ```
@@ -104,19 +104,17 @@ docker-compose up
 
 This will "automagically" do everything for you. But it is important that you know a thing or two about what's going on under the hood: 
 1. Docker-compose will read the __docker-compose.yml__ file and know what services (or containers) it needs to start up.
-2. For each service it will see what _image_ this container is based on, and fetch it (from Docker Hub). In the case of an image not being provided, e.g. the php container, a Dockerfile is used. This file is like a shell script that instructs what needs to be done to create the respective image. 
+2. For each service it will see what _image_ this container is based on, and fetch it (from Docker Hub). In the case of an image not being provided, e.g. the _php container_, a Dockerfile is used. This file is like a shell script that instructs what needs to be done to create the respective image. 
 3. Once docker-compose has the _image_ of each service, it will spin up the respective containers. 
-4. Around this phase, docker-compose sets up a network among all the containers and configures the respective internal DNS entries so that from one container you can reference the remaining by its service name. e.g if from the PHP container you `ping postgres` you'll hit the database server host. 
-5. When the php container is launched, the __docker_run-dev.sh__ script is run within the container (check the Dockerfile-dev for more details). It will wait for the database server to be ready and then, if it is the first start up, it will install the project dependencies (`composer install`) and seed your database (`php artisan db:seed`). And finally, it launches the php server (`php artisan serve`).
+4. Around this phase, docker-compose sets up a network among all the containers and configures the respective internal DNS entries so that from one container you can reference the remaining by its service name. e.g if from the _php container_ you `ping postgres` you'll hit the database server host. 
+5. When the _php container_ is launched, the __docker_run-dev.sh__ script is run within the container (check the Dockerfile-dev for more details). It will wait for the database server to be ready and then, if it is the first start up, it will install the project dependencies (`composer install`) and seed your database (`php artisan db:seed`). And finally, it launches the php server (`php artisan serve`).
 
 
 __Everything should now be up and running.__ Checkout your web server at `http://localhost:8000`, the phpadmin at `http://localhost:5050` and mailhog at `http://localhost:8025`. To stop the servers just hit __Ctrt^C__.
 
 __To restart the containers__, you just issue `docker-compose up` again. This docker-compose up followed by Ctrl^C is similar to turn on and off your computer, meaning that everything will be kept including the data at your database. But if for some reason you want to start fresh you can run `docker-compose down` which will destroy your the containers. The next time you run `docker-compose up`, docker instantiates brand new containers from the previously compiled __images__. (But you'll probably just want to re seed the database [Development phase](#development-phase). Either way, your code will always be kept because it lives in the host (your computer) and is shared with the container.
 
-__When you [publish your image](#publishing-your-image),__ the project source code will be copied to a brand new PHP container, slightly differently configured, and uploaded to Docker Hub. Latter on it will be pulled by an automated process to the production server and, due to the different setup configurations, it will connect to your database at the dbm.fe.up.pt, using the credentials previously given to you.
-
-> Services and containers are not the same thing. If you have a website with a lot of visits, for instance, you might want to run it on multiple computers but only having one address test.com. So you would be providing a service, but running on multiple containers. But for lbaw, thinking container == service is good enough.
+__When you [publish your image](#publishing-your-image),__ the project source code will be copied to a brand new _php container_, slightly differently configured, and uploaded to Docker Hub. Latter on it will be pulled by an automated process to the production server and, due to the different setup configurations, it will connect to your database at the dbm.fe.up.pt, using the credentials previously given to you.
 
 
 # Development phase
@@ -137,7 +135,7 @@ you might notice that the terminal prompt changes to something like `root@acf3db
 ```
 to leave the container execute `exit`.
 
-__Note that the container must be running__ in order that you can run exec. Therefore, if you pause the containers by hitting Ctrl^C, for example, it won't work. This means that you'll have to have one terminal for running the containers and another to exec commands onto the PHP container. Another possible approach is to run docker in detached (background) mode
+__Note that the container must be running__ in order that you can run exec. Therefore, if you pause the containers by hitting Ctrl^C, for example, it won't work. This means that you'll have to have one terminal for running the containers and another to exec commands onto the _php container_. Another possible approach is to run docker in detached (background) mode
 ```
     docker-compose -d up
     # do other things such exec into a container
@@ -145,9 +143,9 @@ __Note that the container must be running__ in order that you can run exec. Ther
     docker-compose stop # pauses the containers
 ```
 
-> This happens because in Docker each container is running a main never-ending process, being that the life cicle of a container is tied to that process. In other words, a container only exists to provide an environment in which that process can be run. In fact when you hit `docker-composer up` and launch the containers, each has one process associated e.g., the php container has the php server, postgres the postgres server, and so on.
+> This happens because in Docker each container is running a main never-ending process and the life cicle of the container is tied to that process. In other words, a container only exists to provide an environment in which that process can run. When you hit `docker-composer up` and launch the containers, each has one process associated e.g., the _php container_ has the PHP server, _postgres_ the PostgreSQL server, and so on.
 
-__You might run into file permissions issues__ if you use `php artisan make` to generate files. This happens because these files will be created by the php container root user. To solve that you can simply run `sudo chown -R $USER .` at the host, after each file(s) generation.
+__You might run into file permissions issues__ if you use `php artisan make` to generate files. This happens because these files will be created by the _php container_ root user. To solve that you can simply run `sudo chown -R $USER .` at the host, after each file(s) generation.
 
 __When you save your changes to Git__ simply stage, commit, merge and push your changes as usually. The only caveat is, if you doing that with terminal, and you are using `docker ... bash` to enter the containers, do not forget that you need to be at the host when commiting and pushing, as thats where your git creadentials live and, on the other hand, if your're not at the host, you you'll run into permission issues with the .git files, analogously to the previous paragraph.
 
@@ -167,7 +165,7 @@ first usage you will need to add the connection to the database using the follow
 Hostname is _postgres_ instead of _localhost_ since _docker composer_ creates an internal _DNS_ entry to
 facilitate connection between linked containers.
 
-# Setting up Php Interpreter and Debugger
+# Setting up PHP Interpreter and Debugger
 
 ### PhpStorm
 
