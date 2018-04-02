@@ -96,7 +96,7 @@ For development purposes we have 4 configured containers. Which are specified un
 4. __mailhog__ It offers a "fake" e-mail server and client.
 
 
-__We setup the PHP container__ so that the project folder is shared with the container i.e. it both lives in your PC(s) and in the container. So when you change your code it also changes inside the container. Ports are also opened and forwarded so that, for instance, when you go to http://localhost:8000 on your browser, you're requests are redirected to the php container (that is where the php server lives).
+__We setup the PHP container__ so that the project folder is shared with the container i.e. it both lives in your PC(s) and in the container. So when you change your code it also changes inside the container. Ports are also opened and forwarded so that, for instance, when you go to http://localhost:8000 on your browser, the requests are redirected to the php container (that is where the php server lives).
 
 __To start the servers__ you simply need to run 
 ```
