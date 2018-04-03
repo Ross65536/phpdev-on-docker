@@ -139,40 +139,15 @@ Thankfully, docker provides a quick way of executing commands inside a container
     docker exec lbaw_php php artisan db:seed
     docker exec lbaw_php composer install
 ```
-Another approach is to "enter" the container by executing:
-```
-    docker exec -it lbaw_php bash
-```
-you might notice that the terminal prompt changes to something like `root@acf3dbd56f07:/app# `. 
-So, you may execute:
-```
-    php artisan db:seed
-    composer install
-```
-to leave the container execute `exit`.
-
 __Note that the container must be running__ in order that you can run exec. 
 Therefore, if you pause the containers by hitting Ctrl^C, for example, it won't work. 
 This means that you'll have to have one terminal for running the containers and another to exec commands onto the _php container_. 
-Another possible approach is to run docker in detached (background) mode:
+
+You may "enter" the container by executing:
 ```
-    docker-compose -d up
-    # do other things such exec into a container
-    
-    docker-compose stop # pauses the containers
+    docker exec -it lbaw_php bash
 ```
-
-In Docker each container is running a main _never-ending process_ and the life cicle of the container is tied to that process. 
-In other words, a container only exists to provide an environment in which that process can run. 
-When you hit `docker-composer up` and launch the containers, each has one process associated (e.g., the _php container_ has the PHP server, _postgres_ the PostgreSQL server, and so on).
-
-__You might run into file permissions issues__ if you use `php artisan make` to generate files. 
-This happens because these files will be created by the _php container_ root user. 
-To solve that you can simply run `sudo chown -R $USER .` at the host, after each file(s) generation.
-
-__When you save your changes to Git__ simply stage, commit, merge and push your changes as usually. 
-The only caveat is, if you are doing that with terminal, and you are using `docker ... bash` to enter the containers, do not forget that you need to be at the host when commiting and pushing, as thats where your git creadentials live. 
-On the other hand, if your're not at the host, you you'll run into permission issues with the .git files, analogously to the previous paragraph.
+Notice that the terminal prompt changes to something like `root@acf3dbd56f07:/app# `. 
 
 
 # Working with pgAdmin
