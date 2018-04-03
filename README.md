@@ -74,7 +74,7 @@ __Docker__ is a tool that allows you to run  _containers_ (similar to virtual ma
 __Docker Compose__ is a tool that helps managing multiple containers at once: start, pause, stop, and so on.
 
 
-### Configured Containers
+### Configured containers
 
 ```
 +-------+ +-------+ +-------+ +-------+
@@ -84,7 +84,7 @@ __Docker Compose__ is a tool that helps managing multiple containers at once: st
 |       | |       | |       | |       |
 +-------+ +-------+ +-------+ +-------+
 +-------------------------------------+
-|             Docker CE               |
+|               Docker                |
 +-------------------------------------+
 ```
 
@@ -97,45 +97,44 @@ For development purposes we have 4 configured containers. Which are specified un
 
 We setup the _php container_ so that the project folder is shared with the container i.e. it both lives in your PC(s) and in the container. So when you change your code it also changes inside the container. Ports are also opened and forwarded so that, for instance, when you go to http://localhost:8000 on your browser, the requests are redirected to the _php container_ (that is where the PHP server lives).
 
-__To start the servers__ you simply need to run 
+__To start the servers__ you simply run 
 ```
 docker-compose up
 ```
 
 This will "automagically" do everything for you. But it is important that you know a thing or two about what's going on under the hood: 
-1. Docker-compose will read the __docker-compose.yml__ file and know what services (or containers) it needs to start up.
-2. For each service it will see what _image_ this container is based on, and fetch it (from Docker Hub). In the case of an image not being provided, e.g. the _php container_, a Dockerfile is used. This file is like a shell script that instructs what needs to be done to create the respective image. 
+1. Docker-compose will read the __docker-compose.yml__ file and know what containers it needs to start up.
+2. For each container, it will see what _image_ this container is based on, and fetch it (from Docker Hub). In the case of an image not being provided, e.g. the _php container_, a Dockerfile is used. This file is like a shell script with commnands to create the corresponding image. 
 3. Once docker-compose has the _image_ of each service, it will spin up the respective containers. 
-4. Around this phase, docker-compose sets up a network among all the containers and configures the respective internal DNS entries so that from one container you can reference the remaining by its service name. e.g if from the _php container_ you `ping postgres` you'll hit the database server host. 
-5. When the _php container_ is launched, the __docker_run-dev.sh__ script is run within the container (check the Dockerfile-dev for more details). It will wait for the database server to be ready and then, if it is the first start up, it will install the project dependencies (`composer install`) and seed your database (`php artisan db:seed`). And finally, it launches the php server (`php artisan serve`).
+4. Around this phase, docker-compose sets up a network among all the containers and configures the respective internal DNS entries so that from one container you can reference the remaining by its service name (e.g if from the _php container_ you `ping postgres` you'll hit the database server host). 
+5. When the _php container_ is launched, the __docker_run-dev.sh__ script is run within the container (check the __Dockerfile-dev__ for more details). It will wait for the database server to be ready and then, if it is the first start up, it will install the project dependencies (`composer install`) and seed your database (`php artisan db:seed`). And finally, it launches the PHP server (`php artisan serve`).
 
+__Everything should now be up and running.__ Checkout your web server at `http://localhost:8000`, the phpAdmin at `http://localhost:5050` and mailhog at `http://localhost:8025`. To stop the servers just hit __Ctrt^C__.
 
-__Everything should now be up and running.__ Checkout your web server at `http://localhost:8000`, the phpadmin at `http://localhost:5050` and mailhog at `http://localhost:8025`. To stop the servers just hit __Ctrt^C__.
+__To restart the containers__, you just issue `docker-compose up` again. This docker-compose up followed by Ctrl^C is similar to turn on and off your computer, meaning that everything will be kept including the data at your database. But if for some reason you want to start fresh, you can run `docker-compose down` which will destroy your the containers. The next time you run `docker-compose up`, docker instantiates brand new containers from the previously compiled __images__. (But you'll probably just want to reseed the database [Development phase](#development-phase). Either way, your code will always be kept because it lives in the host (your computer) and is shared with the container.
 
-__To restart the containers__, you just issue `docker-compose up` again. This docker-compose up followed by Ctrl^C is similar to turn on and off your computer, meaning that everything will be kept including the data at your database. But if for some reason you want to start fresh you can run `docker-compose down` which will destroy your the containers. The next time you run `docker-compose up`, docker instantiates brand new containers from the previously compiled __images__. (But you'll probably just want to re seed the database [Development phase](#development-phase). Either way, your code will always be kept because it lives in the host (your computer) and is shared with the container.
-
-__When you [publish your image](#publishing-your-image),__ the project source code will be copied to a brand new _php container_, slightly differently configured, and uploaded to Docker Hub. Latter on it will be pulled by an automated process to the production server and, due to the different setup configurations, it will connect to your database at the dbm.fe.up.pt, using the credentials previously given to you.
+__When you [publish your image](#publishing-your-image),__ the project source code will be copied to a brand new _php container_, slightly differently configured, and uploaded to Docker Hub. Latter on, it will be pulled by an automated process to the production machine and, due to the different setup configurations, it will connect to your database at the "dbm.fe.up.pt", using the credentials previously given to each group.
 
 
 # Development phase
 
-During the development you might need to re seed your database, or reinstall PHP dependencies i.e., interact with PHP that is running inside the container. Thankfully docker provides a quick way of executing commands inside a container from the host.
+During the development you might need to reseed your database, or reinstall PHP dependencies i.e., interact with PHP that is running inside the container. Thankfully, docker provides a quick way of executing commands inside a container from the host:
 ```
     docker exec lbaw_php php artisan db:seed
     docker exec lbaw_php composer install
 ```
-Another approach is to "enter" the container by executing
+Another approach is to "enter" the container by executing:
 ```
     docker exec -it lbaw_php bash
 ```
-you might notice that the terminal prompt changes to something like `root@acf3dbd56f07:/app# `. So, you can execute
+you might notice that the terminal prompt changes to something like `root@acf3dbd56f07:/app# `. So, you may execute:
 ```
     php artisan db:seed
     composer install
 ```
 to leave the container execute `exit`.
 
-__Note that the container must be running__ in order that you can run exec. Therefore, if you pause the containers by hitting Ctrl^C, for example, it won't work. This means that you'll have to have one terminal for running the containers and another to exec commands onto the _php container_. Another possible approach is to run docker in detached (background) mode
+__Note that the container must be running__ in order that you can run exec. Therefore, if you pause the containers by hitting Ctrl^C, for example, it won't work. This means that you'll have to have one terminal for running the containers and another to exec commands onto the _php container_. Another possible approach is to run docker in detached (background) mode:
 ```
     docker-compose -d up
     # do other things such exec into a container
@@ -143,27 +142,26 @@ __Note that the container must be running__ in order that you can run exec. Ther
     docker-compose stop # pauses the containers
 ```
 
-> This happens because in Docker each container is running a main never-ending process and the life cicle of the container is tied to that process. In other words, a container only exists to provide an environment in which that process can run. When you hit `docker-composer up` and launch the containers, each has one process associated e.g., the _php container_ has the PHP server, _postgres_ the PostgreSQL server, and so on.
+In Docker each container is running a main _never-ending process_ and the life cicle of the container is tied to that process. In other words, a container only exists to provide an environment in which that process can run. When you hit `docker-composer up` and launch the containers, each has one process associated (e.g., the _php container_ has the PHP server, _postgres_ the PostgreSQL server, and so on).
 
 __You might run into file permissions issues__ if you use `php artisan make` to generate files. This happens because these files will be created by the _php container_ root user. To solve that you can simply run `sudo chown -R $USER .` at the host, after each file(s) generation.
 
-__When you save your changes to Git__ simply stage, commit, merge and push your changes as usually. The only caveat is, if you doing that with terminal, and you are using `docker ... bash` to enter the containers, do not forget that you need to be at the host when commiting and pushing, as thats where your git creadentials live and, on the other hand, if your're not at the host, you you'll run into permission issues with the .git files, analogously to the previous paragraph.
+__When you save your changes to Git__ simply stage, commit, merge and push your changes as usually. The only caveat is, if you are doing that with terminal, and you are using `docker ... bash` to enter the containers, do not forget that you need to be at the host when commiting and pushing, as thats where your git creadentials live. On the other hand, if your're not at the host, you you'll run into permission issues with the .git files, analogously to the previous paragraph.
+
 
 # Working with pgAdmin
  
 You will be using _PostgreSQL_ to implement this project. If you've followed the previous sections namely  [Starting Docker Containers](#starting-docker-containers) you should now have both _PostgreSQL_ and _pgAdmin4_ running locally.
  
-The database's username is `postgres` and the password `pg!fcp`. You can access http://localhost:5050 to access _pgAdmin4_ and manage your database.
-
-On the
-first usage you will need to add the connection to the database using the following attributes:
+You can access http://localhost:5050 to access _pgAdmin4_ and manage your database.
+On the first usage you will need to add the connection to the database using the following attributes:
 
     hostname: postgres
     username: postgres
     password: pg!fcp
 
-Hostname is _postgres_ instead of _localhost_ since _docker composer_ creates an internal _DNS_ entry to
-facilitate connection between linked containers.
+Hostname is _postgres_ instead of _localhost_ since _docker composer_ creates an internal _DNS_ entry to facilitate connection between linked containers.
+
 
 # Setting up PHP Interpreter and Debugger
 
@@ -177,9 +175,10 @@ You can check the official instructions [here](https://blog.jetbrains.com/phpsto
 5. Choose __Docker__ and select __lbawlaravel_php:latest__ as the __Image Name__
 6. Hit OK, and it automatically should detect PHP 7.1.15 and Xdebug 2.6.0
 
-# Laravel Code Structure
 
-In Laravel, a typical web request involves the following steps and files:
+# Laravel code structure
+
+In Laravel, a typical web request involves the following steps and files.
 
 ### 1) Routes
 
@@ -188,13 +187,11 @@ By default, routes are defined inside *routes/web.php*. A typical *route* looks 
 
     Route::get('cards/{id}', 'CardController@show');
 
-This route receives a parameter *id* that is passed on to the *show* method of a controller
-called *CardController*.
+This route receives a parameter *id* that is passed on to the *show* method of a controller called *CardController*.
 
 ### 2) Controllers
 
-[Controllers](https://laravel.com/docs/5.5/controllers) group related request handling logic into
-a single class. Controllers are normally defined in the *app/Http/Controllers* folder.
+[Controllers](https://laravel.com/docs/5.5/controllers) group related request handling logic into a single class. Controllers are normally defined in the *app/Http/Controllers* folder.
 
     class CardController extends Controller
     {
@@ -208,20 +205,15 @@ a single class. Controllers are normally defined in the *app/Http/Controllers* f
         }
     }
 
-This particular controller contains a *show* method that receives an *id* from a route. The method
-searches for a card in the database, checks if the user as permission to view the card, and then
-returns a view.
+This particular controller contains a *show* method that receives an *id* from a route. The method searches for a card in the database, checks if the user as permission to view the card, and then returns a view.
 
 ### 3) Database and Models
 
-To access the database, we will use the query builder capabilities of [Eloquent](https://laravel.com/docs/5.5/eloquent) but the initial database seeding will still be done
-using raw SQL (the script that creates the tables can be found in *resources/sql/seed.sql*).
+To access the database, we will use the query builder capabilities of [Eloquent](https://laravel.com/docs/5.5/eloquent) but the initial database seeding will still be done using raw SQL (the script that creates the tables can be found in *resources/sql/seed.sql*).
 
     $card = Card::find($id);
 
-This line tells *Eloquent* to fetch a card from the database with a certain *id* (the primary key of the
-table). The result will be an object of the class *Card* defined in *app/Card.php*. This class extends
-the *Model* class and contains information about the relation between the *card* tables and other tables:
+This line tells *Eloquent* to fetch a card from the database with a certain *id* (the primary key of the table). The result will be an object of the class *Card* defined in *app/Card.php*. This class extends the *Model* class and contains information about the relation between the *card* tables and other tables:
 
     /* A card belongs to one user */
     public function user() {
@@ -235,18 +227,14 @@ the *Model* class and contains information about the relation between the *card*
 
 ### 4) Policies
 
-[Policies](https://laravel.com/docs/5.5/authorization#writing-policies) define which actions a user
-can take. You can find policies inside the *app/Policies* folder. For example, in the *CardPolicy.php*
-file, we defined a *show* method that only allows a certain user to view a card if that user is the
-card owner:
+[Policies](https://laravel.com/docs/5.5/authorization#writing-policies) define which actions a user can take. You can find policies inside the *app/Policies* folder. For example, in the *CardPolicy.php* file, we defined a *show* method that only allows a certain user to view a card if that user is the card owner:
 
     public function show(User $user, Card $card)
     {
       return $user->id == $card->user_id;
     }
 
-In this example policy method, *$user* and *$card* are models that represent their respective tables,
-*$id* and *$user_id* are columns from those tables that are automatically mapped into those models.
+In this example policy method, *$user* and *$card* are models that represent their respective tables, *$id* and *$user_id* are columns from those tables that are automatically mapped into those models.
 
 To use this policy, we just have to use the following code inside the *CardController*:
 
@@ -256,8 +244,7 @@ As you can see, there is no need to pass the current *user*.
 
 ### 5) Views
 
-A *controller* only needs to return HTML code for it to be sent to the *browser*. However we will
-be using [Blade](https://laravel.com/docs/5.5/blade) templates to make this task easier:
+A *controller* only needs to return HTML code for it to be sent to the *browser*. However we will be using [Blade](https://laravel.com/docs/5.5/blade) templates to make this task easier:
 
     return view('pages.card', ['card' => $card]);
 
@@ -267,23 +254,17 @@ The first line of the template states it extends another template:
 
     @extends('layouts.app')
 
-This second template can be found at *resources/views/layouts/app.blade.php* and is the basis
-of all pages in our application. Inside this template, the place where the page template is
-introduced is identified by the following command:
+This second template can be found at *resources/views/layouts/app.blade.php* and is the basis of all pages in our application. Inside this template, the place where the page template is introduced is identified by the following command:
 
     @yield('content')
 
-Besides the *pages* and *layouts* template folders, we also have a *partials* folder where small
-snippets of HTML code can be saved to be reused in other pages.    
+Besides the *pages* and *layouts* template folders, we also have a *partials* folder where small snippets of HTML code can be saved to be reused in other pages.    
 
 ### 6) CSS
 
 The easiest way to use CSS is just to edit the CSS file found at *public/css/app.css*.
 
-If you prefer to use [less](http://lesscss.org/), a PHP version of the less command-line tool as
-been added to the project. In this case, edit the file at *resources/assets/less/app.less* instead and
-keep the following command running in a shell window so that any changes to this file can be
-compiled into the public CSS file:
+If you prefer to use [less](http://lesscss.org/), a PHP version of the less command-line tool as been added to the project. In this case, edit the file at *resources/assets/less/app.less* instead and keep the following command running in a shell window so that any changes to this file can be compiled into the public CSS file:
 
     ./compile-assets.sh
 
@@ -293,20 +274,13 @@ To add Javascript into your project, just edit the file found at *public/js/app.
 
 ## Publishing your image
 
-You should keep your git's master branch always functional and frequently build and deploy your
-code. To do so, you will create a _docker_ image for your project and publish it at
-[docker hub](https://hub.docker.com/). LBAW's production machine will frequently pull all these images and
-make them available at http://<YOUR_GROUP>.lbaw-prod.fe.up.pt/. This demo repository is available at
-[http://demo.lbaw-prod.fe.up.pt/](http://demo.lbaw-prod.fe.up.pt/). Make sure you are inside FEUP's 
-network or VPN.
+You should keep your git's master branch always functional and frequently build and deploy your code. To do so, you will create a _docker_ image for your project and publish it at [docker hub](https://hub.docker.com/). LBAW's production machine will frequently pull all these images and make them available at http://<YOUR_GROUP>.lbaw-prod.fe.up.pt/. This demo repository is available at [http://demo.lbaw-prod.fe.up.pt/](http://demo.lbaw-prod.fe.up.pt/). Make sure you are inside FEUP's network or VPN.
 
-First thing you need to do is create a [docker hub](https://hub.docker.com/) account and get your
-username from it. Once you have a username, let your docker know who you are by executing:
+First thing you need to do is create a [docker hub](https://hub.docker.com/) account and get your username from it. Once you have a username, let your docker know who you are by executing:
 
     docker login
 
-Once your docker is able to communicate with the docker hub using your credentials configure the
-`upload_image.sh` script with your username and group's identification as well. Example configuration
+Once your docker is able to communicate with the docker hub using your credentials configure the `upload_image.sh` script with your username and group's identification as well. Example configuration:
 
     DOCKER_USERNAME=johndoe # Replace by your docker hub username
     IMAGE_NAME=lbaw17GG # Replace by your lbaw group name
