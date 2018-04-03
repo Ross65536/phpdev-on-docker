@@ -55,7 +55,7 @@ Then, copy the contents of the demo repository to your own:
     git checkout master 
     
     # copy all the demo files
-    rsync -av ../phpdev-on-docker/ .
+    cp -r ../phpdev-on-docker/. .
     
     # add the new files to your repository
     git add .  
