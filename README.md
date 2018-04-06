@@ -1,7 +1,7 @@
 
 ## Introduction
 
-This README describes how to setup the development environment for LBAW. 
+This README describes how to setup the "alternative" development environment for LBAW (the official is [here](https://github.com/lbaw-admin/lbaw-laravel)).
 It was prepared to run on Linux but it should be fairly easy to follow and adapt for other operating systems.
 
 * [Installing Docker and Docker Compose](#installing-docker-and-docker-compose)
